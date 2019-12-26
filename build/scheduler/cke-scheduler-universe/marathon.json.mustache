@@ -1,0 +1,41 @@
+{
+  "id": "{{service.name}}",
+  "instances": {{service.instances}},
+  "cpus": {{service.cpus}},
+  "mem": {{service.mem}},
+  "maintainer": "wangc238@chinaunicom.cn",
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+    "image": "reg.mg.hcbss/open/cke-scheduler:v0.0.1",
+    "forcePullImage": true,
+    "privileged": true,
+    "network": "HOST"
+    }
+  },
+  "args":[
+      "/cke-scheduler/cke-scheduler",
+      "-etcd={{cke.etcd}}",
+      "-k8s_cfs={{cke.k8s_cfs}}",
+      "-k8s_docker_path",
+      "\"{{cke.k8s_docker_path}}\"",
+      "-k8s_executor",
+      "{{cke.k8s_executor}}",
+      "-k8s_lxcfs",
+      "\"{{cke.k8s_lxcfs}}\"",
+      "-k8s_node_image",
+      "{{cke.k8s_node_image}}",
+      "-k8s_registry_cert",
+      "{{cke.k8s_registry_cert}}",
+      "-listen",
+      "{{cke.listen}}",
+      "-log_level",
+      "{{cke.log_level}}",
+      "-master",
+      "{{cke.master}}",
+      "-name",
+      "{{cke.name}}",
+      "-roles",
+      "{{cke.roles}}"
+   ]
+}

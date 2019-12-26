@@ -1,0 +1,238 @@
+启动一个kubernetes集群(在内网环境下,使用桥接容器端口的模式实现流量引入)：
+{
+    "cluster_name": "my",
+    "cluster_type": "k8s",
+    "network": "spidernet-vpc56173cke",
+    "kubenodes": [{
+        "name": "master",
+        "type": "master",
+        "host": "10.124.142.224",
+        "node_ip": "192.168.0.80",
+        "process": [{
+            "name": "etcd",
+            "type": "etcd",
+            "res": {
+                "cpu": 0.1,
+                "memory": 512
+            },
+            "cmd": "/usr/local/bin/etcd",
+            "options": []
+        }, {
+            "name": "apiserver",
+            "type": "apiserver",
+            "res": {
+                "cpu": 0.5,
+                "memory": 4086
+            },
+            "cmd": "/usr/local/bin/kube-apiserver",
+            "options": []
+        }, {
+            "name": "controller",
+            "type": "controller",
+            "res": {
+                "cpu": 0.1,
+                "memory": 1024
+            },
+            "cmd": "/usr/local/bin/kube-controller-manager",
+            "options": []
+        }, {
+            "name": "scheduler",
+            "type": "scheduler",
+            "res": {
+                "cpu": 0.1,
+                "memory": 1024
+            },
+            "cmd": "/usr/local/bin/kube-scheduler",
+            "options": []
+        }, {
+            "name": "docker",
+            "type": "masterdocker",
+            "res": {
+                "cpu": 1,
+                "memory": 512
+            },
+            "cmd": "/usr/bin/dockerd",
+            "options": []
+        }]
+    }, {
+        "name": "node0",
+        "type": "node",
+        "host": "10.124.142.224",
+        "node_ip": "192.168.0.81",
+        "ingresses": ["igr1"],
+        "process": [{
+            "name": "docker",
+            "type": "nodedocker",
+            "res": {
+                "cpu": 1,
+                "memory": 512
+            },
+            "cmd": "/usr/bin/dockerd",
+            "options": []
+        }, {
+            "name": "kubelet",
+            "type": "kubelet",
+            "res": {
+                "cpu": 4,
+                "memory": 4096
+            },
+            "cmd": "/usr/local/bin/kubelet",
+            "options": []
+        }, {
+            "name": "kube-proxy",
+            "type": "kubeproxy",
+            "res": {
+                "cpu": 0.5,
+                "memory": 1024
+            },
+            "cmd": "/usr/local/bin/kube-proxy",
+            "options": []
+        }]
+    }, {
+        "name": "console",
+        "type": "console",
+        "host": "*",
+        "node_ip": "192.168.0.82",
+        "gottyport": "",
+        "process": [{
+            "name": "gotty",
+            "type": "gotty",
+            "res": {
+                "cpu": 0.2,
+                "memory": 512
+            },
+            "cmd": "/usr/local/bin/gotty",
+            "options": []
+        }]
+    }],
+    "ingresses": [{
+        "name": "igr1",
+        "port": "34571/tcp"
+    }, {
+        "name": "igr2",
+        "port": "34572/tcp"
+    }, {
+        "name": "igr3",
+        "port": "34573/tcp"
+    }]
+}
+
+
+启动一个kubernetes集群(使用spider LB模式实现流量引入)：
+{
+    "cluster_name": "my",
+    "cluster_type": "k8s",
+    "network": "spidernet-vpc56173cke",
+    "kubenodes": [{
+        "name": "master",
+        "type": "master",
+        "host": "10.124.142.224",
+        "node_ip": "192.168.0.80",
+        "process": [{
+            "name": "etcd",
+            "type": "etcd",
+            "res": {
+                "cpu": 0.1,
+                "memory": 512
+            },
+            "cmd": "/usr/local/bin/etcd",
+            "options": []
+        }, {
+            "name": "apiserver",
+            "type": "apiserver",
+            "res": {
+                "cpu": 0.5,
+                "memory": 4086
+            },
+            "cmd": "/usr/local/bin/kube-apiserver",
+            "options": []
+        }, {
+            "name": "controller",
+            "type": "controller",
+            "res": {
+                "cpu": 0.1,
+                "memory": 1024
+            },
+            "cmd": "/usr/local/bin/kube-controller-manager",
+            "options": []
+        }, {
+            "name": "scheduler",
+            "type": "scheduler",
+            "res": {
+                "cpu": 0.1,
+                "memory": 1024
+            },
+            "cmd": "/usr/local/bin/kube-scheduler",
+            "options": []
+        }, {
+            "name": "docker",
+            "type": "masterdocker",
+            "res": {
+                "cpu": 1,
+                "memory": 512
+            },
+            "cmd": "/usr/bin/dockerd",
+            "options": []
+        }]
+    }, {
+        "name": "node0",
+        "type": "node",
+        "host": "10.124.142.224",
+        "node_ip": "192.168.0.81",
+        "ingresses": ["igr1"],
+        "process": [{
+            "name": "docker",
+            "type": "nodedocker",
+            "res": {
+                "cpu": 1,
+                "memory": 512
+            },
+            "cmd": "/usr/bin/dockerd",
+            "options": []
+        }, {
+            "name": "kubelet",
+            "type": "kubelet",
+            "res": {
+                "cpu": 4,
+                "memory": 4096
+            },
+            "cmd": "/usr/local/bin/kubelet",
+            "options": []
+        }, {
+            "name": "kube-proxy",
+            "type": "kubeproxy",
+            "res": {
+                "cpu": 0.5,
+                "memory": 1024
+            },
+            "cmd": "/usr/local/bin/kube-proxy",
+            "options": []
+        }]
+    }, {
+        "name": "console",
+        "type": "console",
+        "host": "*",
+        "node_ip": "192.168.0.82",
+        "gottyport": "",
+        "process": [{
+            "name": "gotty",
+            "type": "gotty",
+            "res": {
+                "cpu": 0.2,
+                "memory": 512
+            },
+            "cmd": "/usr/local/bin/gotty",
+            "options": []
+        }]
+    }],
+    "ingresses": [{
+        "name": "igr1",
+        "port": ""
+    }, {
+        "name": "igr2",
+        "port": ""
+    }, {
+        "name": "igr3",
+        "port": ""
+    }]
+}

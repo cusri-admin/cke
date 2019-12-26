@@ -1,0 +1,16 @@
+build/bin
+build/scheduler/docker/files
+build/wrapper.k8s/docker/files
+build/wrapper.k8s/files/usr/local/bin/gotty
+/cke-ui/node_modules
+cke.sublime-project
+cke.sublime-workspace
+sftp-config.*
+.idea/
+/cke容器脚本参数说明.txt
+.vscode
+cke.code-workspace
+/html/node_modules
+/html/exec/cke*
+/html/build/*
+/build/wrapper.k8s/files/usr/local/bin/ttt.sh

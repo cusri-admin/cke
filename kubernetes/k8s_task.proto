@@ -1,0 +1,79 @@
+syntax = "proto3"; // 语法使用 protocol buffer proto3
+package kubernetes;
+
+//数据文件
+message k8s_file {
+	//文件的路径
+	string path = 1;
+
+	//文件的读写属性
+	int32 mode = 2;
+
+	//文件的数据
+	bytes data = 3;
+}
+
+//kubernetes task进程启动所需的信息和数据
+message process_info{
+	//进程的位置(全路径)
+	string cmd = 1;
+	
+	//进程的工作目录
+	string work_path = 2;
+	
+	//进程的参数
+	repeated string args = 3;
+	
+	//进程的环境变量
+	repeated string envs = 4;
+	
+	//进程依赖的数据文件
+	map<string,k8s_file> files = 5;
+}
+
+//kuberbetes 使用的dns信息
+message k8s_dns_record{
+	string host = 1;
+	string ip = 2;
+}
+
+//kuberbetes node的信息
+message k8s_node_info{
+	//该节点kubernetes组件使用的网络
+	string network = 1;
+	
+	//该Kube Node使用的IP
+	string ip = 2;
+
+	//该k8s集群各节点的 dns信息
+	repeated k8s_dns_record dns_record = 3;
+
+	//node环境需要的数据文件
+	map<string,k8s_file> files = 4;
+
+	//发布服务的边界节点,对外提供服务的端口(如: 80/tcp)
+	repeated string publish_ports = 5;
+}
+
+enum k8s_task_type{
+	START_NODE = 0;
+	START_PROCESS = 1;
+}
+
+//scheduler和executor传递的kub node的任务
+message k8s_task{
+	//所属的Kube Node名称
+	string node_id = 1;
+
+	//任务使用的镜像名称
+	string image = 2;
+	
+	//该任务的类型
+	k8s_task_type task_type = 3;
+
+	//k8s节点信息
+	k8s_node_info node = 4;
+
+	//进程信息
+	process_info process = 5;
+}

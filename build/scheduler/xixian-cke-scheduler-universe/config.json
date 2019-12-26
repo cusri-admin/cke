@@ -1,0 +1,71 @@
+{
+  "type": "object",
+  "properties": {
+    "service": {
+      "title": "公共配置",
+      "type": "object",
+      "description": "在Mesos上启动CKE引擎的配置",
+      "properties": {
+        "name": {
+          "title": "服务名称",
+          "description": "在管理Marathon上显示的服务名称",
+          "type": "string",
+          "default": "cke-framework"
+        },
+        "instances": {
+          "title": "实例数",
+          "description": "CKE引擎自身（scheduler）的实例数",
+          "type": "number",
+          "default": 1
+        },
+        "cpus": {
+          "title": "CPU数量",
+          "description": "CKE引擎自身（scheduler）在Mesos集群上使用的CPU数量",
+          "type": "number",
+          "default": 0.5
+        },
+        "mem": {
+          "title": "内存数量(MB)",
+          "description": "CKE引擎自身（scheduler）在Mesos集群上使用的内存数量 (MB)",
+          "type": "number",
+          "default": 512
+        }
+      },
+      "required": [
+        "name",
+        "instances",
+        "cpus",
+        "mem"
+      ]
+    },
+    "cke": {
+      "title": "CKE配置",
+      "type": "object",
+      "description": "在Mesos上启动CKE引擎的配置",
+      "properties": {
+        "name": {
+          "description": "CKE引擎在Mesos上的框架名称 (缺省值为 cke-framework)",
+          "type": "string",
+          "default": "cke-framework",
+          "title": "框架名称"
+        },
+        "roles": {
+          "description": "框架使用的Role名称 (缺省值为 *)",
+          "type": "string",
+          "default": "",
+          "title": "Roles名称"
+        },
+        "k8s_spider_lb_endpoint": {
+          "description": "Spider网络负载均衡对外访问接入点 (缺省值为 http://10.125.128.1:65334)",
+          "type": "string",
+          "default": "http://10.125.128.1:65334",
+          "title": "Spider网络负载均衡对外访问接入点"
+        }
+      },
+      "required": [
+        "name",
+        "roles"
+      ]
+    }
+  }
+}

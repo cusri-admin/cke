@@ -1,0 +1,266 @@
+ImageName: "cke-k8s-wrapper-v1.16:v$VERSION"
+Variables:
+  RootCertPath: "/etc/kubernetes/ssl/ca.pem"    # OK
+  RootKeyPath: "/etc/kubernetes/ssl/ca-key.pem" # OK
+  CertPath: "/etc/kubernetes/ssl"
+  RegistryCertPath: "/etc/docker/certs.d"
+  ClusterIPRange: "11.254.0.0/16" # OK
+  KubernetesClusIP: "11.254.0.1"  # OK
+  DashboardSvcClusIP: "11.254.0.2"  # OK
+  CorednsSvcClusIP: "11.254.0.10"  # OK
+  PRO_CPU: "0.1"
+  PRO_MEM: "256"
+NodeConfs:
+  master:
+    Variables:
+      ServerCertPath: "/etc/kubernetes/ssl/server.pem"    # OK
+      ServerKeyPath: "/etc/kubernetes/ssl/server-key.pem" # OK
+      APIServerSecPort: "6443" # OK
+      APIServerInsecAddr: "127.0.0.1" # OK
+      APIServerInsecPort: "8081" # OK
+      APIServerTokenFile: "/etc/kubernetes/cfg/token.csv" # OK
+      ClusterPodCidr: "172.30.0.0/16" # OK
+    ProcessConfs:
+      etcd:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/etcd"
+        args:
+          - {key: "--name", value: "$native", modify: true}
+          - {key: "--listen-peer-urls", value: "https://$NODE_IP:2390", modify: false}
+          - {key: "--initial-advertise-peer-urls", value: "https://$NODE_IP:2390", modify: false}
+          - {key: "--listen-client-urls", value: "https://$NODE_IP:2389", modify: false}
+          - {key: "--advertise-client-urls", value: "https://$NODE_IP:2389", modify: false}
+          - {key: "--initial-cluster", value: "$native", modify: true}
+          - {key: "--cert-file", value: "$ServerCertPath", modify: false}
+          - {key: "--key-file", value: "$ServerKeyPath", modify: false}
+          - {key: "--peer-cert-file", value: "$ServerCertPath", modify: false}
+          - {key: "--peer-key-file", value: "$ServerKeyPath", modify: false}
+          - {key: "--trusted-ca-file", value: "$RootCertPath", modify: false}
+          - {key: "--peer-trusted-ca-file", value: "$RootCertPath", modify: false}
+          - {key: "--initial-cluster-token", value: "etcd-cluster-0", modify: true}
+          - {key: "--initial-cluster-state", value: "new", modify: true}
+          - {key: "--data-dir", value: "/var/lib/etcd", modify: true}
+      etcdhc:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/etcd-cluster-health.sh"
+        args:
+          - {key: "-e", value: "$ETCD_SERVERS", modify: true}
+          - {key: "-t", value: "$native", modify: true}
+      apiserver:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/kube-apiserver"
+        args:
+          - {key: "--advertise-address", value: "$NODE_IP", modify: true}
+          - {key: "--bind-address", value: "$NODE_IP", modify: true}
+          - {key: "--insecure-bind-address", value: "$APIServerInsecAddr", modify: true}
+          - {key: "--secure-port", value: "$APIServerSecPort", modify: true}
+          - {key: "--insecure-port", value: "$APIServerInsecPort", modify: true}
+          - {key: "--token-auth-file", value: "$APIServerTokenFile", modify: true}
+          - {key: "--service-cluster-ip-range", value: "$ClusterIPRange", modify: true}
+          - {key: "--kubelet-https", value: "true", modify: true}
+          - {key: "--tls-cert-file", value: "$ServerCertPath", modify: true}
+          - {key: "--tls-private-key-file", value: "$ServerKeyPath", modify: true}
+          - {key: "--client-ca-file", value: "$RootCertPath", modify: true}
+          - {key: "--service-account-key-file", value: "$RootKeyPath", modify: true}
+          - {key: "--etcd-cafile", value: "$RootCertPath", modify: true}
+          - {key: "--etcd-certfile", value: "$ServerCertPath", modify: true}
+          - {key: "--etcd-keyfile", value: "$ServerKeyPath", modify: true}
+          - {key: "--etcd-servers", value: "$ETCD_SERVERS", modify: true}
+          - {key: "--apiserver-count", value: "", modify: true}
+          - {key: "--logtostderr", value: "true", modify: true}
+          - {key: "--v", value: "4", modify: true}
+          - {key: "--allow-privileged", value: "true", modify: true}
+          - {key: "--enable-admission-plugins", value: "NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,NodeRestriction,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,Priority", modify: true}
+          - {key: "--authorization-mode", value: "RBAC,Node", modify: true}
+          - {key: "--enable-bootstrap-token-auth", value: "", modify: true}
+          - {key: "--service-node-port-range", value: "30000-50000", modify: true}
+          - {key: "--requestheader-client-ca-file", value: "$RootCertPath", modify: true}
+          - {key: "--requestheader-allowed-names", value: "aggregator", modify: true}
+          - {key: "--requestheader-extra-headers-prefix", value: "X-Remote-Extra-", modify: true}
+          - {key: "--requestheader-group-headers", value: "X-Remote-Group", modify: true}
+          - {key: "--requestheader-username-headers", value: "X-Remote-User", modify: true}
+          - {key: "--proxy-client-cert-file", value: "$RootCertPath", modify: true}
+          - {key: "--proxy-client-key-file", value: "$RootKeyPath", modify: true}
+          - {key: "--enable-aggregator-routing", value: "true", modify: true}
+      controller:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/kube-controller-manager"
+        args:
+          - {key: "--master", value: "http://$APIServerInsecAddr:$APIServerInsecPort", modify: true}
+          - {key: "--allocate-node-cidrs", value: "true", modify: true}
+          - {key: "--service-cluster-ip-range", value: "$ClusterIPRange", modify: true}
+          - {key: "--cluster-cidr", value: "$ClusterPodCidr", modify: true}
+          - {key: "--cluster-signing-cert-file", value: "$RootCertPath", modify: true}
+          - {key: "--cluster-signing-key-file", value: "$RootKeyPath", modify: true}
+          - {key: "--service-account-private-key-file", value: "$RootKeyPath", modify: true}
+          - {key: "--root-ca-file", value: "$RootCertPath", modify: true}
+          - {key: "--logtostderr", value: "true", modify: true}
+          - {key: "--v", value: "4", modify: true}
+          - {key: "--leader-elect", value: "true", modify: true}
+          - {key: "--address", value: "127.0.0.1", modify: true}
+          - {key: "--cluster-name", value: "kubernetes", modify: true}
+      scheduler:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/kube-scheduler"
+        args:
+          - {key: "--master", value: "http://$APIServerInsecAddr:$APIServerInsecPort", modify: true}
+          - {key: "--logtostderr", value: "true", modify: true}
+          - {key: "--v", value: "4", modify: true}
+          - {key: "--leader-elect", value: "", modify: true}
+      masterdocker:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/bin/dockerd"
+        args:
+          - {key: "--registry-mirror", value: "https://$DOCKER_REGISTRY", modify: true}
+          - {key: "--storage-driver", value: "overlay", modify: false}
+      initmastercalico:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/init-calico.sh"
+        envs:
+          - {key: "NODE_IP", value: "$NODE_IP", modify: true}
+        args:
+          - {key: "-e", value: "$ETCD_SERVERS", modify: true}
+          - {key: "-n", value: "$native", modify: true}
+      masterhc:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/k8s-cluster-master-health.sh"
+        env:
+          - {key: "INGRESS_TYPE", value: "$LB_TYPE", modify: true}
+        args:
+          - {key: "-e", value: "$ETCD_SERVERS", modify: true}
+          - {key: "-i", value: "$ClusterPodCidr", modify: true}
+          - {key: "-p", value: "$DASHBOARD_VPORT", modify: true}
+          - {key: "-d", value: "$DashboardSvcClusIP", modify: false}
+          - {key: "-c", value: "$CorednsSvcClusIP", modify: false}
+          - {key: "-i", value: "$ClusterPodCidr", modify: true}
+          - {key: "-p", value: "$DASHBOARD_VPORT", modify: true}
+  node:
+    ProcessConfs:
+      crbuilding:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/create-node-rolebinding.sh"
+      nodeconf:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/create-k8s-config.sh"
+        args:
+          - {key: "-t", value: "$native", modify: true}
+          - {key: "-i", value: "$CORE_DNS_IPS", modify: false}
+          - {key: "-a", value: "$NODE_IP", modify: false}
+      nodedocker:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/bin/dockerd"
+        args:
+          - {key: "--registry-mirror", value: "https://$DOCKER_REGISTRY", modify: true}
+          - {key: "--storage-driver", value: "overlay", modify: false}
+      kubelet:
+        cmd: "/usr/local/bin/kubelet"
+        args:
+          - {key: "--hostname-override", value: "$NODE_IP", modify: true}
+          - {key: "--bootstrap-kubeconfig", value: "/etc/kubernetes/cfg/bootstrap.kubeconfig", modify: true}
+          - {key: "--kubeconfig", value: "/etc/kubernetes/cfg/kubelet.kubeconfig", modify: true}
+          - {key: "--cert-dir", value: "$CertPath", modify: true}
+          - {key: "--network-plugin", value: "cni", modify: true}
+          - {key: "--config", value: "/etc/kubernetes/cfg/kubelet.config", modify: true}
+          - {key: "--v", value: "4", modify: true}
+          - {key: "--pod-infra-container-image", value: "$DOCKER_REGISTRY/cke-init-image/pause-amd64:v3.0", modify: true}
+      kubeproxy:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/kube-proxy"
+        args:
+          - {key: "--hostname-override", value: "$NODE_IP", modify: true}
+          - {key: "--cluster-cidr", value: "$ClusterIPRange", modify: true}
+          - {key: "--kubeconfig", value: "/etc/kubernetes/cfg/kubelet.kubeconfig", modify: true}
+          - {key: "--conntrack-max-per-core", value: "0", modify: true}
+          - {key: "--v", value: "4", modify: true}
+      initnodecalico:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/init-calico.sh"
+        envs:
+          - {key: "NODE_IP", value: "$NODE_IP", modify: true}
+        args:
+          - {key: "-e", value: "$ETCD_SERVERS", modify: false}
+          - {key: "-n", value: "$NodeName", modify: true}
+      kubelethc:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/k8s-cluster-node-health.sh"
+        args:
+          - {key: "-i", value: "$NODE_IP", modify: true}
+      removenode:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/destory-kubenode.sh"
+        args:
+          - {key: "-i", value: "$native", modify: true}
+          - {key: "-n", value: "$native", modify: true}
+  console:
+    ProcessConfs:
+      kubeconf:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/create-kubectl-config.sh"
+        args:
+          - {key: "-t", value: "$native", modify: true}
+          - {key: "-i", value: "$CORE_DNS_IPS", modify: false}
+      gotty:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "chroot"
+        args:
+          - {key: "/home/kubectl", value: "", modify: true}
+          - {key: "gotty", value: "", modify: true}
+          - {key: "--port", value: "$GOTTY_PORT", modify: true}
+          - {key: "--permit-write", value: "", modify: true}
+          - {key: "--permit-arguments", value: "", modify: true}
+          - {key: "/bin/sh", value: "", modify: true}
+      ckeproxy:
+        res:
+          cpu: "$PRO_CPU"
+          mem: "$PRO_MEM"
+        cmd: "/usr/local/bin/cke-k8s-proxy"
+        args:
+          - {key: "-apiserver_proxy_port", value: "$API_PROXY_PORT", modify: true}
+          - {key: "-dashboard_proxy_port", value: "$DASH_PROXY_PORT", modify: true}
+          - {key: "-gateway_manager_port", value: "$MANAGE_PORT", modify: true}
+          - {key: "-apiserver_address", value: "https://$KubernetesClusIP:443", modify: true}
+          - {key: "-dashboard_address", value: "https://$DashboardSvcClusIP:443", modify: true}
+          - {key: "-gotty_address", value: "http://127.0.0.1:$GOTTY_PORT", modify: true}
+          - {key: "-cluster_ip_range", value: "$ClusterIPRange", modify: true}
+          - {key: "-svc_gateway_node_ip", value: "$native", modify: true}
+        files:
+
+
+
+
+
+

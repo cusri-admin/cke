@@ -1,0 +1,16 @@
+FROM alpine:3.7
+
+#LABEL maintainer="Z&B<zhengbin@chinaunicom.cn>"
+
+# Docker Build Arguments
+#ARG CKE_VERSION="0.0.1"
+
+#LABEL cke_version="0.0.1"
+
+#RUN export proxyipiponly="10.0.209.105"
+#ENV PATH=$PATH:/opt/cke/bin
+
+# Copy nginx configuration files
+COPY bin/cke-exec-vm /opt/cke/bin/cke-exec-vm
+
+CMD ["/opt/cke/bin/cke-exec-vm"]

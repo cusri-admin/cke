@@ -1,0 +1,19 @@
+##  Dockerfile文件格式
+# This dockerfile uses the alpine image
+# VERSION 1 - EDITION 1
+# Author: Z&B
+
+# 1、第一行必须指定 基础镜像信息
+FROM scheduler-alpine:v0.0.1
+ 
+# 2、维护者信息
+MAINTAINER Z&B zhengbin@chinaunicom.cn
+ 
+# 3、镜像操作指令
+ADD "./files/cke-scheduler" "/cke-scheduler/"
+ADD "./files/default_cfg" "/cke-scheduler/default_cfg"
+ADD "./files/reg.mg.hcbss" "/cke-scheduler/reg.mg.hcbss"
+ADD "./files/harbor.dcos.xixian.unicom.local" "/cke-scheduler/harbor.dcos.xixian.unicom.local"
+ADD "./files/html/build" "/cke-scheduler/html/build"
+
+WORKDIR /cke-scheduler

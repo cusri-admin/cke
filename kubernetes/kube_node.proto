@@ -1,0 +1,99 @@
+syntax = "proto3"; // 语法使用 protocol buffer proto3
+import "kubernetes/k8s_task.proto";
+package kubernetes;
+service WrapperProto {
+	rpc EventCall(stream wrapper_event) returns (stream executor_event) {}
+	rpc Exec(exec_info) returns(exec_result){}
+}
+
+// executor侧事件的格式定义(executor发送,wrapper接收)
+message executor_event {
+	enum event_type{
+		SAVE_FILE = 0;
+		START_REQ = 1;
+		STOP_REQ = 2;
+		SHUTDOWN_REQ = 3;
+		MESSAGE = 4;
+	}
+
+	//事件类型，有5种
+	event_type type = 1;
+
+	//要执行的任务号和mesos task id一致
+	// 最后一个字符'.'将id分成两部分，前面为task name对应可以理解为process name，后面为随机数标识这次的操作
+	string task_id = 2;
+
+	//任务对应的进程信息
+	process_info process = 3;
+
+	//环境需要的数据文件
+	map<string,k8s_file> files = 4;
+
+	string msg = 5;
+}
+// wrapper侧事件的格式定义(wrapper发送,executor接收)
+message wrapper_event {
+	enum event_type{
+		REGISTERED = 0;
+		MESSAGE = 1;
+		RESPONSE = 2;
+		HEARTBEAT = 3;
+	}
+
+	//事件类型，有4种：REGISTERED, MESSAGE, RESPONSE, HEARTBEAT
+	event_type type = 1;
+
+	//已经执行的任务号和mesos task id一致
+	string task_id = 2;
+
+	message response{
+	    enum stat_type{
+	    		SAVED = 0;
+    			UNSAVED = 1;
+    			RUNNING = 2;
+    			FINISHED = 3;
+    			FAILED = 4;
+    			KILLED = 5;
+    	}
+    	//任务执行状态
+		stat_type code = 1;
+
+		//错误码
+		string error = 2;
+	}
+	//所属的Kube Node名称
+	string node_id = 3;
+
+	//任务执行的响应，对应event_type=RESPONSE
+	response resp = 4;
+
+	//消息内容对应event_type=MESSAGE
+	string msg = 5;
+
+	//心跳节奏(下一次心跳来的时间),对应event_type=HEARTBEAT
+	int32 heartbeat = 6;
+}
+
+//执行命令的请求体
+message exec_info{
+	//所属的Kube Node名称
+	string node_id = 1;
+	
+	//进程的位置(全路径)
+	string cmd = 2;
+	
+	//进程的工作目录
+	string work_path = 3;
+	
+	//进程的参数
+	repeated string args = 4;
+	
+	//进程的环境变量
+	repeated string envs = 5;
+}
+
+//执行命令的结果
+message exec_result{
+	int32 code = 1;
+	string result = 2;
+}

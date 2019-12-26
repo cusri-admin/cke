@@ -1,0 +1,16 @@
+{
+  "packagingVersion": "3.0",
+  "name": "西咸测试区-cke",
+  "framework": true,
+  "description": "西咸测试区-cke 运行在DCOS之上,正式发布1.0版",
+  "version": "1.0.0",
+  "scm": "",
+  "maintainer": "wangc238@chinaunicom.cn",
+  "tags": [
+    "西咸测试区-cke"
+  ],
+  "preInstallNotes": "西咸测试区-cke",
+  "postInstallNotes": "西咸测试区-cke",
+  "postUninstallNotes": "西咸测试区-cke",
+  "licenses": []
+}

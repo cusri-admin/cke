@@ -1,0 +1,98 @@
+{
+    "cluster_name": "my",
+    "cluster_type": "k8s",
+    "network": "ckenet",
+    "kubenodes": [
+        {
+            "name": "master",
+            "type": "master",
+            "host": "10.124.142.224",
+            "node_ip": "10.124.220.55",
+            "process": [
+                {
+                    "name": "etcd",
+                    "type": "etcd",
+                    "cpu": 0.1,
+                    "memory": 1024,
+                    "cmd": "/usr/local/bin/etcd",
+                    "options": []
+                },
+                {
+                    "name": "apiserver",
+                    "type": "apiserver",
+                    "cpu": 0.5,
+                    "memory": 4086,
+                    "cmd": "/usr/local/bin/kube-apiserver",
+                    "options": []
+                },
+                {
+                    "name": "controller",
+                    "type": "controller",
+                    "cpu": 0.1,
+                    "memory": 1024,
+                    "cmd": "/usr/local/bin/kube-controller-manager",
+                    "options": []
+                },
+                {
+                    "name": "scheduler",
+                    "type": "scheduler",
+                    "cpu": 0.1,
+                    "memory": 1024,
+                    "cmd": "/usr/local/bin/kube-scheduler",
+                    "options": []
+                },
+                {
+                    "name": "docker",
+                    "type": "masterdocker",
+                    "cpu": 1,
+                    "memory": 512,
+                    "cmd": "/usr/bin/dockerd",
+                    "options": []
+                }
+            ]
+        },
+        {
+            "name": "node0",
+            "type": "node",
+            "host": "10.124.142.224",
+            "node_ip": "10.124.220.56",
+            "ingresses": ["igr1","igr2"],
+            "process": [
+                {
+                    "name": "docker",
+                    "type": "nodedocker",
+                    "cpu": 1,
+                    "memory": 512,
+                    "cmd": "/usr/bin/dockerd",
+                    "options": []
+                },
+                {
+                    "name": "kubelet",
+                    "type": "kubelet",
+                    "cpu": 4,
+                    "memory": 4096,
+                    "cmd": "/usr/local/bin/kubelet",
+                    "options": []
+                },
+                {
+                    "name": "kube-proxy",
+                    "type": "kubeproxy",
+                    "cpu": 0.5,
+                    "memory": 1024,
+                    "cmd": "/usr/local/bin/kube-proxy",
+                    "options": []
+                }
+            ]
+        }
+    ],
+    "ingresses":[
+        {
+            "name":"igr1",
+            "port":"34567/tcp"
+        },
+        {
+            "name":"igr2",
+            "port":"34568/tcp"
+        }
+    ]
+}

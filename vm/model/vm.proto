@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+// 虚拟机数据结构
+message libVm {
+  string id = 1;
+  string name = 2;
+  int32 cpus = 3;
+  int32 mem  = 4;
+  string host = 5;
+  BootType bootType = 6;
+  NetInfo network = 7;
+  VDisk disk = 8;
+  string region = 9;
+  string zone = 10;
+  map<string, string> osInfo = 11;
+  map<string, string> label = 12;
+}
+
+//Boot类型
+enum BootType {
+  BOOT_FILE = 0;
+  BOOT_SHARE = 1;
+}
+
+//网络信息
+message NetInfo {
+  string id = 1;
+  string name = 2;
+  string type = 3;
+  string mode = 4;
+  string ipv4Addr = 5;
+  string ipv6Addr = 6;
+}
+
+//磁盘信息
+message VDisk {
+  VmDisk systemDisk = 1;
+  repeated VmDisk dataDisk = 2;
+}
+
+// VmDisk信息
+message VmDisk {
+  string name = 1;
+  string type = 2;
+  int64 size = 3;
+  map<string, string> info = 4;
+}

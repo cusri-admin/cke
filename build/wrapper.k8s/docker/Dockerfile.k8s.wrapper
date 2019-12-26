@@ -1,0 +1,29 @@
+##  Dockerfile文件格式
+##作者王辰
+#2019年4月12日
+# k8s-v1.13.1+calico-v3.6
+# This dockerfile uses the ubuntu image
+# VERSION 2 - EDITION 1
+# Author: docker_user
+# Command format: Instruction [arguments / command] ..
+
+# 1、第一行必须指定 基础镜像信息
+FROM docker-alpine:v0.0.5
+ 
+# 2、维护者信息
+MAINTAINER wangchen wangc238@chinaunicom.cn
+ 
+# 3、镜像操作指令
+ADD ./files/lib64 /lib64/
+ADD ./files/etc /etc/
+ADD ./files/etc/kubernetes/dashboardcrt /etc/kubernetes/dashboardcrt/
+ADD ./files/opt/cni/bin /opt/cni/bin/
+ADD ./files/usr/bin /usr/bin/
+ADD ./files/usr/local/bin /usr/local/bin/
+
+RUN mkdir -p /etc/kubernetes/ssl/ && mkdir -p /etc/kubernetes/cfg/ && mkdir -p /etc/coredns/cfg/ && mkdir -p /etc/cni/net.d/ && mkdir -p /etc/calico/
+
+WORKDIR /home/kubernetes/k8s
+
+# 4、容器启动执行指令
+CMD ["/usr/local/bin/cke-k8s-wrapper"]

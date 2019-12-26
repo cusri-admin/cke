@@ -1,0 +1,904 @@
+swagger: "2.0"
+info:
+  description: "CKE产品中心RESTFul API定义"
+  version: "0.0.1"
+  title: "CKE Center API"
+  contact:
+    email: "zhengbin@chinaunicom.cn"
+basePath: "/cke/v1"
+tags:
+- name: "center"
+  description: "CKE 产品中心API"
+- name: "region"
+  description: "提供CKE服务的DCOS集群API"
+- name: "cke"
+  description: "CKE 管理功能"
+schemes:
+- "https"
+- "http"
+paths:
+  /regions:
+    get:
+      tags:
+      - "center"
+      summary: "获得可创建产品实例的地域(region)信息列表"
+      operationId: "getRegions"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Region"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/fee/price_info:
+    get:
+      tags:
+      - "center"
+      summary: "获得可创建产品实例的地域(region)的价格信息"
+      operationId: "getRegionPrice"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "区域id"
+        required: true
+        type: "string"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Price"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/fee/k8s/clusters:
+    get:
+      tags:
+      - "center"
+      summary: "获得指定地域(region)的费用信息"
+      operationId: "getRegionFee"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "区域id"
+        required: true
+        type: "string"
+      - name: "start"
+        in: "query"
+        description: "开始时间"
+        type: "string"
+        format: "date-time"
+      - name: "end"
+        in: "query"
+        description: "结束时间"
+        type: "string"
+        format: "date-time"
+      - name: "uid"
+        in: "header"
+        description: "区域id"
+        required: true
+        type: "string"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Fee"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/fee/k8s/clusters/{cluster_name}:
+    get:
+      tags:
+      - "center"
+      summary: "获得指定地域(region)的一个集群费用的明细信息"
+      operationId: "getInstanceFee"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "区域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "产品实例名"
+        required: true
+        type: "string"
+      - name: "start"
+        in: "query"
+        description: "开始时间"
+        type: "string"
+        format: "date-time"
+      - name: "end"
+        in: "query"
+        description: "结束时间"
+        type: "string"
+        format: "date-time"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Details"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/k8s/v1/clusters:
+    get:
+      tags:
+      - "region"
+      summary: "获得指定区域的k8s集群列表"
+      operationId: "getClusters"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "区域id"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ClusterItem"
+        404:
+          description: "Invalid path value"
+    post:
+      tags:
+      - "region"
+      summary: "创建一个集群实例"
+      operationId: "createCluster"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "区域id"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "要创建的Kubernetes的配置信息"
+        required: true
+        schema:
+          $ref: "#/definitions/ClusterConf"
+      responses:
+        202:
+          description: "Accepted"
+        400:
+          description: "Invalid json format"
+        404:
+          description: "Invalid path value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/k8s/v1/clusters/{cluster_name}:
+    get:
+      tags:
+      - "cke"
+      summary: "获得集群详细信息"
+      operationId: "getCluster"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "地域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "集群名称"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ClusterInfo"
+        404:
+          description: "Invalid path value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "region"
+      - "cke"
+      summary: "删除指定集群"
+      operationId: "removeCluster"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "地域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "集群名称"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+        404:
+          description: "Invalid path value"
+        409:
+          description: "Conflict"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/k8s/v1/clusters/{cluster_name}/change_logs:
+    get:
+      tags:
+      - "region"
+      summary: "获得指定集群在CKE引擎上的资源变更日志"
+      operationId: "getClusterChangeLog"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "地域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "集群名称"
+        required: true
+        type: "string"
+      - name: "start"
+        in: "query"
+        description: "开始时间"
+        type: "string"
+        format: "date-time"
+      - name: "end"
+        in: "query"
+        description: "结束时间"
+        type: "string"
+        format: "date-time"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ChangeLog"
+        404:
+          description: "Invalid path value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/k8s/v1/clusters/{cluster_name}/logs:
+    get:
+      tags:
+      - "cke"
+      summary: "获得集群在CKE引擎上的日志"
+      operationId: "getClusterLog"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "地域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "集群名称"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/LogInfo"
+        404:
+          description: "Invalid path value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/k8s/v1/clusters/{cluster_name}/console:
+    get:
+      tags:
+      - "cke"
+      summary: "进入集群的管理控制台"
+      operationId: "getClusterConsole"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "地域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "集群名称"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+        404:
+          description: "Invalid path value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/k8s/v1/clusters/{cluster_name}/dashboard:
+    get:
+      tags:
+      - "cke"
+      summary: "进入集群的Dashboard UI"
+      operationId: "getClusterDashBoard"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "地域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "集群名称"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+        404:
+          description: "Invalid path value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/k8s/v1/clusters/{cluster_name}/nodes/{node_name}:
+    get:
+      tags:
+      - "cke"
+      summary: "获得指定集群中某KubeNode的详细信息"
+      operationId: "getNode"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "地域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "集群名称"
+        required: true
+        type: "string"
+      - name: "node_name"
+        in: "path"
+        description: "节点名称"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/NodeInfo"
+        404:
+          description: "Invalid path value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "region"
+      - "cke"
+      summary: "删除集群中的指定KubeNode"
+      operationId: "removeNode"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "地域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "集群名称"
+        required: true
+        type: "string"
+      - name: "node_name"
+        in: "path"
+        description: "节点名称"
+        required: true
+        type: "string"
+      responses:
+        202:
+          description: "Accepted"
+        400:
+          description: "Invalid process value"
+        404:
+          description: "Invalid path value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/k8s/v1/clusters/{cluster_name}/nodes/{node_name}/processes/{pro_name}:
+    put:
+      tags:
+      - "region"
+      - "cke"
+      summary: "修改集群中指定KubeNode上的进程配置并重启"
+      operationId: "updateProcess"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "地域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "集群名称"
+        required: true
+        type: "string"
+      - name: "node_name"
+        in: "path"
+        description: "节点名称"
+        required: true
+        type: "string"
+      - name: "pro_name"
+        in: "path"
+        description: "进程名称"
+        required: true
+        type: "string"
+      - name: "body"
+        in: "body"
+        description: "要更新的进程配置信息"
+        required: true
+        schema:
+          $ref: "#/definitions/ProcConf"
+      responses:
+        202:
+          description: "Accepted"
+        400:
+          description: "Invalid process value"
+        404:
+          description: "Invalid path value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /regions/{region_id}/k8s/v1/clusters/{cluster_name}/nodes/{node_name}/processes/{pro_name}/files/{file_name}:
+    get:
+      tags:
+      - "cke"
+      summary: "获得指定集群中某KubeNode的某进程的日志文件"
+      operationId: "getProcessFile"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "region_id"
+        in: "path"
+        description: "地域id"
+        required: true
+        type: "string"
+      - name: "cluster_name"
+        in: "path"
+        description: "集群名称"
+        required: true
+        type: "string"
+      - name: "node_name"
+        in: "path"
+        description: "节点名称"
+        required: true
+        type: "string"
+      - name: "pro_name"
+        in: "path"
+        description: "进程名称"
+        required: true
+        type: "string"
+      - name: "file_name"
+        in: "path"
+        description: "文件名称"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+        404:
+          description: "Invalid path value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+securityDefinitions:
+  petstore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:pets: "modify pets in your account"
+      read:pets: "read your pets"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Region:
+    type: "object"
+    required:
+    - "id"
+    - "name"
+    - "url"
+    properties:
+      id:
+        type: "string"
+        description: "地域id"
+      name:
+        type: "string"
+        description: "地域显示名称"
+      url:
+        type: "string"
+        description: "地域对应的url"
+      versios:
+        type: "array"
+        description: "该地域支持的CKE引擎版本"
+        items:
+          $ref: "#/definitions/CKEVer"
+  CKEVer:
+    type: "object"
+    properties:
+      cke_ver:
+        type: "string"
+      api_ver:
+        type: "string"
+  Price:
+    type: "object"
+    description: "各region的价格描述"
+    properties:
+      cpu:
+        type: "number"
+        format: "float"
+        description: "cpu价格"
+      mem:
+        type: "number"
+        format: "float"
+        description: "内存价格"
+      disk:
+        type: "number"
+        format: "float"
+        description: "存储价格"
+      unit:
+        type: "string"
+        enum:
+        - "/year"
+        - "/month"
+        - "/daily"
+        - "/hour"
+        - "/minute"
+        - "/second"
+        description: "计量单位"
+  Fee:
+    type: "object"
+    description: "CKE产品实例费用合计"
+    properties:
+      cluster:
+        type: "string"
+      start_time:
+        type: "string"
+        format: "date-time"
+      stop_time:
+        type: "string"
+        format: "date-time"
+      fee:
+        type: "number"
+        format: "float"
+  Details:
+    allOf:
+    - $ref: "#/definitions/ChangeLog"
+    - type: "object"
+      description: "CKE产品实例费用明细"
+      properties:
+        fee:
+          type: "number"
+          format: "float"
+  ChangeLog:
+    type: "object"
+    description: "CKE产品实例变更明细"
+    properties:
+      cluster:
+        type: "string"
+        description: "产品实例名称"
+      total_res:
+        $ref: "#/definitions/Resource"
+      start_time:
+        type: "string"
+        format: "date-time"
+      stop_time:
+        type: "string"
+        format: "date-time"
+  ClusterItem:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      total_res:
+        $ref: "#/definitions/Resource"
+      master_count:
+        type: "integer"
+      node_count:
+        type: "integer"
+        format: "int32"
+      create_time:
+        type: "string"
+        format: "date-time"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "running"
+        description: "该集群当前的状态"
+      console_url:
+        type: "string"
+      dashboard:
+        type: "string"
+  ClusterInfo:
+    allOf:
+    - $ref: "#/definitions/ClusterBaseConf"
+    - type: "object"
+      properties:
+        create_time:
+          type: "string"
+          format: "date-time"
+        expect:
+          type: "string"
+          enum:
+          - "run"
+          - "stop"
+          description: "该集群应该的状态"
+        status:
+          type: "string"
+          enum:
+          - "starting"
+          - "running"
+          description: "该集群当前的状态"
+        total_res:
+          $ref: "#/definitions/Resource"
+        nodes:
+          type: "array"
+          items:
+            $ref: "#/definitions/NodeItem"
+        console_url:
+          type: "string"
+        dashboard:
+          type: "string"
+  NodeItem:
+    allOf:
+    - $ref: "#/definitions/NodeBaseConf"
+    - type: "object"
+      properties:
+        real_host:
+          type: "string"
+          description: "节点运行的真实主机"
+        start_time:
+          type: "string"
+          format: "date-time"
+        total_res:
+          $ref: "#/definitions/Resource"
+        expect:
+          type: "string"
+          enum:
+          - "run"
+          - "stop"
+          description: "该节点应该的状态"
+        status:
+          type: "string"
+          enum:
+          - "starting"
+          - "running"
+          description: "该节点当前的状态"
+  NodeInfo:
+    allOf:
+    - $ref: "#/definitions/NodeBaseConf"
+    - type: "object"
+      properties:
+        real_host:
+          description: "节点运行的真实主机"
+          type: "string"
+        start_time:
+          type: "string"
+          format: "date-time"
+        expect:
+          type: "string"
+          enum:
+          - "run"
+          - "stop"
+          description: "该节点应该的状态"
+        status:
+          type: "string"
+          enum:
+          - "starting"
+          - "running"
+          description: "该节点当前的状态"
+        processes:
+          type: "array"
+          items:
+            $ref: "#/definitions/ProcInfo"
+  ProcInfo:
+    allOf:
+    - $ref: "#/definitions/ProcConf"
+    - type: "object"
+      properties:
+        start_time:
+          type: "string"
+          format: "date-time"
+        status:
+          type: "string"
+          enum:
+          - "staging"
+          - "starting"
+          - "running"
+          - "failed"
+          - "killing"
+          - "killed"
+          description: "该进程当前的状态"
+        files:
+          description: "该进程相关的输出文件"
+          type: "array"
+          items:
+            $ref: "#/definitions/ProcFile"
+  ClusterConf:
+    description: "集群的配置"
+    allOf:
+    - $ref: "#/definitions/ClusterBaseConf"
+    - type: "object"
+      properties:
+        nodes:
+          type: "array"
+          items:
+            $ref: "#/definitions/NodeConf"
+  ClusterBaseConf:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      network:
+        type: "string"
+      ingresses:
+        type: "array"
+        items:
+          $ref: "#/definitions/Ingress"
+  NodeConf:
+    description: "节点的配置"
+    allOf:
+    - $ref: "#/definitions/NodeBaseConf"
+    - type: "object"
+    - properties:
+        processes:
+          type: "array"
+          items:
+            $ref: "#/definitions/ProcConf"
+  NodeBaseConf:
+    type: "object"
+    description: "节点基本的配置"
+    properties:
+      name:
+        type: "string"
+      type:
+        type: "string"
+        enum:
+        - "master"
+        - "node"
+      host:
+        type: "string"
+        description: "希望节点运行在哪个主机上"
+      node_ip:
+        type: "string"
+        description: "节点在私有网络的地址"
+      ingresses:
+        type: "array"
+        items:
+          type: "string"
+  Ingress:
+    type: "object"
+    description: "Ingress的配置"
+    properties:
+      name:
+        type: "string"
+      port:
+        type: "string"
+        description: "ingress在主机上的服务端口"
+  ProcConf:
+    type: "object"
+    description: "进程的配置"
+    properties:
+      name:
+        type: "string"
+      type:
+        type: "string"
+      res:
+        $ref: "#/definitions/Resource"
+      cmd:
+        type: "string"
+      options:
+        type: "array"
+        items:
+          type: "string"
+  Resource:
+    type: "object"
+    description: "配置的资源信息"
+    properties:
+      cpu:
+        type: "number"
+        format: "double"
+      mem:
+        type: "number"
+        format: "double"
+      disk:
+        type: "number"
+        format: "double"
+  ProcFile:
+    type: "object"
+    description: "进程的相关文件"
+    properties:
+      name:
+        type: "string"
+      file_name:
+        type: "string"
+  LogInfo:
+    type: "object"
+    description: "该集群在CKE引擎上的日志消息"
+    properties:
+      type:
+        type: "string"
+        enum:
+        - "log"
+        - "cluster_stat"
+        - "node_stat"
+        - "process_stat"
+      time:
+        type: "string"
+        format: "date-time"
+      node:
+        type: "string"
+      process:
+        type: "string"
+      level:
+        type: "string"
+      msg:
+        type: "string"

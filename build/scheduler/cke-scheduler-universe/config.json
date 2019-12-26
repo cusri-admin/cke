@@ -1,0 +1,140 @@
+{
+  "type": "object",
+  "properties": {
+    "service": {
+      "type": "object",
+      "description": "DC/OS service configuration properties",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "Name of service",
+          "type": "string",
+          "default": "cke-scheduler"
+        },
+        "instances": {
+          "title": "Instances",
+          "description": "Instances of service",
+          "type": "number",
+          "default": 1
+        },
+        "cpus": {
+          "title": "CPU",
+          "description": "Service CPU requirements",
+          "type": "number",
+          "default": 0.1
+        },
+        "mem": {
+          "title": "Memory(MB)",
+          "description": "Service mem requirements (in MB)",
+          "type": "number",
+          "default": 256
+        }    
+      },
+      "required": [
+        "name",
+        "instances",
+        "cpus",
+        "mem"
+      ]
+    },
+    "cke": {
+      "type": "object",
+      "description": "DC/OS service task configuration properties",
+      "properties": {
+        "etcd": {
+          "description": "Specify the ETCD of the scheduler, do not use if it is empty.",
+          "type": "string",
+          "default": "",
+          "title": "Etcd"
+        },
+        "k8s_cfs": {
+          "description": "Enable docker CFS in KubeNode.",
+          "type": "string",
+          "enum": [
+            "true",
+            "false"
+          ],
+          "default": "false",
+          "title": "K8s cfs"
+        },
+        "k8s_docker_path": {
+          "description": "The work path of the docker in the container.",
+          "type": "string",
+          "default": "",
+          "title": "K8s docker path"
+        },
+        "k8s_executor": {
+          "description": "The path of mesos executor for CKE kubernetes (default /usr/local/bin/cke-k8s-exec)",
+          "type": "string",
+          "default": "/usr/local/bin/cke-k8s-exec",
+          "title": "K8s executor"
+        },
+        "k8s_lxcfs": {
+          "description": "The path of LXCFS. if set this argument LXCFS will be used in KubeNode.",
+          "type": "string",
+          "default": "",
+          "title": "K8s_lxcfs"
+        },
+        "k8s_node_image": {
+          "description": "CKE KubeNode docker image (default reg.mg.hcbss/open/cke-k8s-wrapper:v0.0.1)",
+          "type": "string",
+          "default": "reg.mg.hcbss/open/cke-k8s-wrapper:v0.0.1",
+          "title": "K8s node image"
+        },
+        "k8s_registry_cert": {
+          "description": "Docker registry cert for k8s cluster (default /cke-scheduler/reg.mg.hcbss.crt)",
+          "type": "string",
+          "default": "/cke-scheduler/reg.mg.hcbss.crt",
+          "title": "K8s registry cert"
+        },
+        "listen": {
+          "description": "Http service listen address (default 0.0.0.0:8512).",
+          "type": "string",
+          "default": "0.0.0.0:8512",
+          "title": "Listen"
+        },
+        "log_level": {
+          "description": "level of output logs (default INFO).",
+          "type": "string",
+          "enum": [
+            "INFO",
+            "DEBUG",
+            "ERROR",
+            "WARNING"
+          ],
+          "default": "INFO",
+          "title": "Log level"
+        },
+        "master": {
+          "description": "Mesos masters (default 10.124.142.222:5050).",
+          "type": "string",
+          "default": "10.124.142.222:5050",
+          "title": "Master"
+        },
+        "name": {
+          "description": "Framework's name (default cke-framework)",
+          "type": "string",
+          "default": "cke-framework",
+          "title": "Name"
+        },
+        "roles": {
+          "description": "Whitch role of framework (default *)",
+          "type": "string",
+          "default": "*",
+          "title": "Roles"
+        }  
+      },
+      "required": [
+        "k8s_cfs",
+        "k8s_executor",
+        "k8s_node_image",
+        "k8s_registry_cert",
+        "listen",
+        "log_level",
+        "master",
+        "name",
+        "roles"
+      ]
+    }
+  }
+}

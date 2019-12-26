@@ -1,0 +1,94 @@
+{
+    "name": "my",
+    "network": "spidernetgroup-vpc01214ppk",
+    "expect": "RUN",
+    "ingress": {
+      "type": "spider-lb",
+      "bridges": []
+    },
+    "nodes": [
+      {
+        "name": "master0",
+        "type": "master",
+        "host": "10.124.142.60",
+        "expect": "RUN",
+        "node_ip": "192.168.0.6",
+        "process": [
+          {
+            "name": "etcd",
+            "type": "etcd",
+            "options": []
+          },
+          {
+            "name": "apiserver",
+            "type": "apiserver",
+            "options": []
+          },
+          {
+            "name": "controller",
+            "type": "controller",
+            "options": []
+          },
+          {
+            "name": "scheduler",
+            "type": "scheduler",
+            "options": []
+          },
+          {
+            "name": "docker",
+            "type": "masterdocker",
+            "options": []
+          }
+        ]
+      },
+      {
+        "name": "node0",
+        "type": "node",
+        "host": "10.124.142.60",
+        "expect": "RUN",
+        "node_ip": "192.168.0.7",
+        "process": [
+          {
+            "name": "kubelet",
+            "type": "kubelet",
+            "res": {
+              "cpu": 2,
+              "mem": 2048
+            },
+            "options": []
+          },
+          {
+            "name": "docker",
+            "type": "nodedocker",
+            "options": []
+          },
+          {
+            "name": "kube-proxy",
+            "type": "kubeproxy",
+            "options": []
+          }
+        ],
+        "ingress": false
+      },
+      {
+        "name": "console",
+        "type": "console",
+        "host": "10.124.142.60",
+        "node_ip": "192.168.0.5",
+        "process": [
+          {
+            "name": "gotty",
+            "type": "gotty",
+            "options": []
+          },
+          {
+            "name": "ckeproxy",
+            "type": "ckeproxy",
+            "options": []
+          }
+        ],
+        "gottyport": ""
+      }
+    ],
+    "k8s_ver": "1.16"
+  }

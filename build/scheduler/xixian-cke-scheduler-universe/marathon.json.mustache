@@ -1,0 +1,32 @@
+{
+  "id": "{{service.name}}",
+  "instances": {{service.instances}},
+  "cpus": {{service.cpus}},
+  "mem": {{service.mem}},
+  "maintainer": "wangc238@chinaunicom.cn",
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+    "image": "harbor.dcos.xixian.unicom.local/cke-init-image/cke-scheduler:v0.1.0",
+    "forcePullImage": true,
+    "privileged": false,
+    "network": "BRIDGE",
+    "portMappings": [
+        { "containerPort": 8512, "hostPort": 0, "protocol": "tcp" }
+      ]
+    }
+  },
+  "args":[
+      "/cke-scheduler/cke-scheduler",
+      "-failover", "30",
+      "-k8s_docker_path","/vdata/cke/",
+      "-k8s_lxcfs_path","/var/lib/lxc/lxcfs/",
+      "-k8s_node_image","harbor.dcos.xixian.unicom.local/cke-init-image/cke-k8s-wrapper:v0.1.0",
+      "-k8s_registry","harbor.dcos.xixian.unicom.local:10.125.128.109",
+      "-k8s_registry_cert","/cke-scheduler/harbor.dcos.xixian.unicom.local/harbor.dcos.xixian.unicom.local.crt",
+      "-k8s_spider_lb_endpoint","{{cke.k8s_spider_lb_endpoint}}",
+      "-master","10.172.49.2:5050,10.172.49.7:5050,10.172.49.15:5050",
+      "-name","{{cke.name}}",
+      "-roles","{{cke.roles}}"
+   ]
+}
