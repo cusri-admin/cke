@@ -190,9 +190,6 @@ func domainXml(vm *model.LibVm, ctx *LibVirtContext) (string, error) {
     }()
     wg.Wait()
     //Graphic VNC
-    //<graphics type='vnc' port='5906' autoport='no' listen='10.124.142.219' passwd='secret'>
-    //      <listen type='address' address='10.124.142.219'/>
-    //</graphics>
     var graph graphics
     if vm.Label["showVnc"] == "yes" {
         graph = graphics{
